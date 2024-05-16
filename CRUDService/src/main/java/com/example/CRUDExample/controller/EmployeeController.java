@@ -1,50 +1,46 @@
-package com.example.CRUDService.controller;
+package com.example.CRUDExample.controller;
 
-import com.example.CRUDService.model.Employee;
-import com.example.CRUDService.repository.EmployeeRepository;
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import com.example.CRUDExample.model.Employee;
+import com.example.CRUDExample.service.EmployeeService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
-
+    
+	private EmployeeService employeeService;
+    
     @Autowired
-    private EmployeeRepository employeeRepository;
+    public EmployeeController(EmployeeService employeeService) {
+		this.employeeService = employeeService;
+	}
 
-    @GetMapping("/")
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
+
+	@GetMapping
+    public List<Employee> getAllEmploy(){
+		System.out.println("I am inside controller");
+    	return employeeService.getAllEmployee();
     }
 
-    @GetMapping("/{id}")
-    public Employee getEmployeeById(@PathVariable Long id) {
-        return employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found with id " + id));
-    }
-
-    @PostMapping("/")
-    public Employee createEmployee(@RequestBody Employee employee) {
-        return employeeRepository.save(employee);
+    @PostMapping("/post")
+    public Employee postEmployee(@RequestBody Employee employee) {
+        return employeeService.createEmployee(employee);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteEmployee(@PathVariable Long id) {
-        employeeRepository.deleteById(id);
+    public void deleteEmployee(@PathVariable Long id, @RequestBody Employee employee) {
+        employeeService.deleteById(id);
     }
 
-    @PutMapping("/{id}")
-    public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee employeeDetails) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found with id " + id));
+    @PutMapping("/edit")
+    public Employee updateEmployee(@RequestBody long id, @RequestBody Employee employeeDetails) {
+    	Employee updatedEmployee = employeeService.editEmployee(employeeDetails, id);
+    	return employeeService.editEmployee(employeeDetails, id);
 
-        employee.setFirstName(employeeDetails.getFirstName());
-        employee.setLastName(employeeDetails.getLastName());
-        employee.setDob(employeeDetails.getDob());
-        employee.setSsn(employeeDetails.getSsn());
-
-        return employeeRepository.save(employee);
     }
 }
